@@ -58,15 +58,16 @@ matrix_t *serial_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B)
         return NULL;
     }
 
-    matrix_C = create_matrix(matrix_A->rows, matrix_B->cols, 0);
-
-    for (size_t i = 0; i < matrix_A->rows; i++)
+    if ((matrix_C = create_matrix(matrix_A->rows, matrix_B->cols, 0)) != NULL)
     {
-        for (size_t j = 0; j < matrix_B->cols; j++)
+        for (size_t i = 0; i < matrix_A->rows; i++)
         {
-            for (size_t k = 0; k < matrix_A->cols; k++)
+            for (size_t j = 0; j < matrix_B->cols; j++)
             {
-                matrix_C->elements[i][j] += matrix_A->elements[i][k] * matrix_B->elements[k][j];
+                for (size_t k = 0; k < matrix_A->cols; k++)
+                {
+                    matrix_C->elements[i][j] += matrix_A->elements[i][k] * matrix_B->elements[k][j];
+                }
             }
         }
     }
