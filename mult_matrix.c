@@ -74,7 +74,7 @@ void serial_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matrix_
     printf("\nSerial calculation:\n");
 
     gettimeofday(&start, NULL);
-    
+
     for (size_t i = 0; i < matrix_A->rows; i++)
     {
         for (size_t j = 0; j < matrix_B->cols; j++)
@@ -87,10 +87,10 @@ void serial_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matrix_
             printf("[%3ld,%3ld] = %d\n", i, j, matrix_C->elements[i][j]);
         }
     }
-    
+
     gettimeofday(&end, NULL);
     exec_time = ((end.tv_sec - start.tv_sec) * 1000.) + (end.tv_usec - start.tv_usec) / 1000.0;
-    
+
     printf("Serial calculation time: %.3lf ms\n", exec_time);
 }
 
@@ -125,9 +125,9 @@ void parallel_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matri
     args = calloc(num_threads, sizeof(thread_args_t));
 
     printf("\nParallel calculation:\n");
-    
+
     gettimeofday(&start, NULL);
-    
+
     for (size_t i = 0; i < matrix_A->rows; i++)
     {
         for (size_t j = 0; j < matrix_B->cols; j++)
@@ -148,7 +148,7 @@ void parallel_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matri
     {
         pthread_join(threads[i], NULL);
     }
-    
+
     gettimeofday(&end, NULL);
     exec_time = ((end.tv_sec - start.tv_sec) * 1000.0) + (end.tv_usec - start.tv_usec) / 1000.0;
     printf("Parallel calculation time: %.3lf ms\n", exec_time);
