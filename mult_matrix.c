@@ -73,32 +73,24 @@ void output_matrix(const matrix_t *matrix, char *title)
     }
 }
 
-matrix_t *serial_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B)
+void serial_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matrix_t *matrix_C)
 {
-    matrix_t *matrix_C = NULL;
-    if (matrix_A == NULL || matrix_B == NULL || matrix_A->cols != matrix_B->rows)
-    {
-        return NULL;
-    }
+    if (matrix_A == NULL || matrix_B == NULL || matrix_C == NULL || matrix_A->cols != matrix_B->rows)
+        return;
 
-    if ((matrix_C = create_matrix(matrix_A->rows, matrix_B->cols, 0)) != NULL)
+    for (size_t i = 0; i < matrix_A->rows; i++)
     {
-        for (size_t i = 0; i < matrix_A->rows; i++)
+        for (size_t j = 0; j < matrix_B->cols; j++)
         {
-            for (size_t j = 0; j < matrix_B->cols; j++)
+            for (size_t k = 0; k < matrix_A->cols; k++)
             {
-                for (size_t k = 0; k < matrix_A->cols; k++)
-                {
-                    matrix_C->elements[i][j] += matrix_A->elements[i][k] * matrix_B->elements[k][j];
-                }
+                matrix_C->elements[i][j] += matrix_A->elements[i][k] * matrix_B->elements[k][j];
             }
         }
     }
-
-    return matrix_C;
 }
 
-void *start_routine(void *args)
+void *multiple_routine(void *args)
 {
     pthread_exit(NULL);
 }
@@ -108,22 +100,23 @@ int main(int argc, char const *argv[])
     size_t n = 9, m = 5, k = 11;
     matrix_t *matrix_A = NULL, *matrix_B = NULL, *matrix_C = NULL;
     size_t num_threads = 0;
-
-    // Create and fill matrixes
+ 
     matrix_A = create_matrix(n, m, 1);
     matrix_B = create_matrix(m, k, 1);
 
-    // Output matrixes
     output_matrix(matrix_A, "Matrix A:");
     output_matrix(matrix_B, "Matrix B:");
 
+    matrix_C = create_matrix(n, k, 0);
+
     // Serial calculation without threads;
-    matrix_C = serial_multiply(matrix_A, matrix_B);
+    serial_multiply(matrix_A, matrix_B, matrix_C);
     output_matrix(matrix_C, "Serial calculation - Matrix C:");
+    delete_matrix(matrix_C);
 
     delete_matrix(matrix_A);
     delete_matrix(matrix_B);
-    delete_matrix(matrix_C);
+    
 
     return 0;
 }
