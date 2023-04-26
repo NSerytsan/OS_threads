@@ -96,10 +96,11 @@ void serial_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matrix_
                 matrix_C->elements[i][j] +=
                     matrix_A->elements[i][k] * matrix_B->elements[k][j];
             }
+            printf("[%3ld,%3ld]=%d\n",i, j, matrix_C->elements[i][j]);
         }
     }
 
-    output_matrix(matrix_C, "Serial calculation - Matrix C:");
+    //output_matrix(matrix_C, "Serial calculation - Matrix C:");
 }
 
 void *multiply_routine(void *args)
@@ -112,6 +113,7 @@ void *multiply_routine(void *args)
             thread_args->matrix_A->elements[thread_args->i][k] * thread_args->matrix_B->elements[k][thread_args->j];
     }
 
+    printf("[%3ld,%3ld]=%d\n",thread_args->i, thread_args->j, thread_args->matrix_C->elements[thread_args->i][thread_args->j]);
     pthread_exit(NULL);
 }
 
@@ -150,7 +152,7 @@ void parallel_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matri
         pthread_join(threads[i], NULL);
     }
 
-    output_matrix(matrix_C, "Parallel calculation - Matrix C:");
+    //output_matrix(matrix_C, "Parallel calculation - Matrix C:");
 
     free(args);
     free(threads);
@@ -158,15 +160,15 @@ void parallel_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matri
 
 int main(int argc, char const *argv[])
 {
-    size_t n = 9, m = 5, k = 11;
+    size_t n = 10, m = 10000, k = 20;
     matrix_t *matrix_A = NULL, *matrix_B = NULL, *matrix_C = NULL;
     size_t num_threads = 0;
 
     matrix_A = create_matrix(n, m, 1);
     matrix_B = create_matrix(m, k, 1);
 
-    output_matrix(matrix_A, "Matrix A:");
-    output_matrix(matrix_B, "Matrix B:");
+    //output_matrix(matrix_A, "Matrix A:");
+    //output_matrix(matrix_B, "Matrix B:");
 
     matrix_C = create_matrix(n, k, 0);
 
