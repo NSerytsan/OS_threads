@@ -100,7 +100,7 @@ int main(int argc, char const *argv[])
     size_t n = 9, m = 5, k = 11;
     matrix_t *matrix_A = NULL, *matrix_B = NULL, *matrix_C = NULL;
     size_t num_threads = 0;
- 
+
     matrix_A = create_matrix(n, m, 1);
     matrix_B = create_matrix(m, k, 1);
 
@@ -116,7 +116,6 @@ int main(int argc, char const *argv[])
 
     delete_matrix(matrix_A);
     delete_matrix(matrix_B);
-    
 
     return 0;
 }
