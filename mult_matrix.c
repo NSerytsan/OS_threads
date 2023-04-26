@@ -3,10 +3,9 @@
 #include <stdio.h>
 
 typedef int element_t;
-typedef element_t **elements_t;
 typedef struct matrix_t
 {
-    elements_t elements;
+    element_t **elements;
     size_t rows;
     size_t cols;
 } matrix_t;
@@ -82,7 +81,7 @@ void *start_routine(void *args)
 
 int main(int argc, char const *argv[])
 {
-    size_t n = 5, m = 4, k = 6;
+    size_t n = 9, m = 5, k = 11;
     matrix_t *matrix_A = NULL, *matrix_B = NULL, *matrix_C = NULL;
     size_t num_threads = 0;
 
