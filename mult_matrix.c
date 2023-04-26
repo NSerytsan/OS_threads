@@ -63,21 +63,6 @@ matrix_t *create_matrix(size_t rows, size_t cols, int autofill)
     return matrix;
 }
 
-void output_matrix(const matrix_t *matrix, FILE *fp)
-{
-    if (matrix == NULL || fp == NULL)
-        return;
-
-    for (size_t i = 0; i < matrix->rows; i++)
-    {
-        for (size_t j = 0; j < matrix->cols; j++)
-        {
-            fprintf(fp, " %d", matrix->elements[i][j]);
-        }
-        fprintf(fp, "\n");
-    }
-}
-
 void serial_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matrix_t *matrix_C)
 {
     struct timeval start, end;
