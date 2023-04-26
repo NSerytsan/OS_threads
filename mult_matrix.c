@@ -102,7 +102,7 @@ void serial_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matrix_
     output_matrix(matrix_C, "Serial calculation - Matrix C:");
 }
 
-void *multiple_routine(void *args)
+void *multiply_routine(void *args)
 {
     thread_args_t *thread_args = args;
 
@@ -139,7 +139,7 @@ void parallel_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matri
             args[thread_count].i = i;
             args[thread_count].j = j;
 
-            pthread_create(&threads[thread_count], NULL, multiple_routine, &args[thread_count]);
+            pthread_create(&threads[thread_count], NULL, multiply_routine, &args[thread_count]);
 
             thread_count++;
         }
