@@ -62,23 +62,18 @@ matrix_t *create_matrix(size_t rows, size_t cols, int autofill)
     return matrix;
 }
 
-void output_matrix(const matrix_t *matrix, char *title)
+void output_matrix(const matrix_t *matrix, FILE *fp)
 {
-    if (matrix == NULL)
+    if (matrix == NULL || fp == NULL)
         return;
-
-    if (title != NULL)
-    {
-        printf("%s\n", title);
-    }
 
     for (size_t i = 0; i < matrix->rows; i++)
     {
         for (size_t j = 0; j < matrix->cols; j++)
         {
-            printf(" %3d", matrix->elements[i][j]);
+            fprintf(fp, " %d", matrix->elements[i][j]);
         }
-        printf("\n");
+        fprintf(fp, "\n");
     }
 }
 
@@ -86,7 +81,9 @@ void serial_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matrix_
 {
     if (matrix_A == NULL || matrix_B == NULL || matrix_C == NULL || matrix_A->cols != matrix_B->rows)
         return;
-
+    
+    printf("Serial calculation:\n");
+    
     for (size_t i = 0; i < matrix_A->rows; i++)
     {
         for (size_t j = 0; j < matrix_B->cols; j++)
@@ -99,8 +96,6 @@ void serial_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matrix_
             printf("[%3ld,%3ld]=%d\n",i, j, matrix_C->elements[i][j]);
         }
     }
-
-    //output_matrix(matrix_C, "Serial calculation - Matrix C:");
 }
 
 void *multiply_routine(void *args)
@@ -131,6 +126,8 @@ void parallel_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matri
     threads = calloc(num_threads, sizeof(pthread_t));
     args = calloc(num_threads, sizeof(thread_args_t));
 
+    printf("Parallel calculation:\n");
+
     for (size_t i = 0; i < matrix_A->rows; i++)
     {
         for (size_t j = 0; j < matrix_B->cols; j++)
@@ -152,23 +149,21 @@ void parallel_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matri
         pthread_join(threads[i], NULL);
     }
 
-    //output_matrix(matrix_C, "Parallel calculation - Matrix C:");
-
     free(args);
     free(threads);
 }
 
 int main(int argc, char const *argv[])
 {
-    size_t n = 10, m = 10000, k = 20;
+    size_t n = 10, m = 100000, k = 20;
     matrix_t *matrix_A = NULL, *matrix_B = NULL, *matrix_C = NULL;
     size_t num_threads = 0;
 
     matrix_A = create_matrix(n, m, 1);
     matrix_B = create_matrix(m, k, 1);
 
-    //output_matrix(matrix_A, "Matrix A:");
-    //output_matrix(matrix_B, "Matrix B:");
+    //output_matrix(matrix_A, stdout);
+    //output_matrix(matrix_B, stdout);
 
     matrix_C = create_matrix(n, k, 0);
 
