@@ -10,6 +10,26 @@ typedef struct matrix_t
     size_t cols;
 } matrix_t;
 
+void delete_matrix(matrix_t *matrix)
+{
+    if (matrix == NULL)
+        return;
+
+    if (matrix->elements != NULL)
+    {
+        for (size_t i = 0; i < matrix->rows; i++)
+        {
+            if (matrix->elements == NULL)
+                continue;
+            free(matrix->elements[i]);
+        }
+
+        free(matrix->elements);
+    }
+
+    free(matrix);
+}
+
 matrix_t *create_matrix(size_t rows, size_t cols, int autofill)
 {
     matrix_t *matrix = calloc(1, sizeof(matrix_t));
@@ -100,6 +120,10 @@ int main(int argc, char const *argv[])
     // Serial calculation without threads;
     matrix_C = serial_multiply(matrix_A, matrix_B);
     output_matrix(matrix_C, "Serial calculation - Matrix C:");
+
+    delete_matrix(matrix_A);
+    delete_matrix(matrix_B);
+    delete_matrix(matrix_C);
 
     return 0;
 }
