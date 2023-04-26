@@ -93,7 +93,8 @@ void serial_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matrix_
         {
             for (size_t k = 0; k < matrix_A->cols; k++)
             {
-                matrix_C->elements[i][j] += matrix_A->elements[i][k] * matrix_B->elements[k][j];
+                matrix_C->elements[i][j] +=
+                    matrix_A->elements[i][k] * matrix_B->elements[k][j];
             }
         }
     }
@@ -103,6 +104,14 @@ void serial_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matrix_
 
 void *multiple_routine(void *args)
 {
+    thread_args_t *thread_args = args;
+
+    for (size_t k = 0; k < thread_args->matrix_A->cols; k++)
+    {
+        thread_args->matrix_C->elements[thread_args->i][thread_args->j] +=
+            thread_args->matrix_A->elements[thread_args->i][k] * thread_args->matrix_B->elements[k][thread_args->j];
+    }
+
     pthread_exit(NULL);
 }
 
@@ -119,14 +128,16 @@ void parallel_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matri
     num_threads = matrix_A->rows * matrix_B->cols;
     threads = calloc(num_threads, sizeof(pthread_t));
     args = calloc(num_threads, sizeof(thread_args_t));
-    
+
     for (size_t i = 0; i < matrix_A->rows; i++)
     {
-        for(size_t j = 0; j < matrix_B->cols; j++)
+        for (size_t j = 0; j < matrix_B->cols; j++)
         {
             args[thread_count].matrix_A = matrix_A;
             args[thread_count].matrix_B = matrix_B;
             args[thread_count].matrix_C = matrix_C;
+            args[thread_count].i = i;
+            args[thread_count].j = j;
 
             pthread_create(&threads[thread_count], NULL, multiple_routine, &args[thread_count]);
 
@@ -138,7 +149,7 @@ void parallel_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matri
     {
         pthread_join(threads[i], NULL);
     }
-    
+
     output_matrix(matrix_C, "Parallel calculation - Matrix C:");
 
     free(args);
@@ -164,6 +175,7 @@ int main(int argc, char const *argv[])
     delete_matrix(matrix_C);
 
     matrix_C = create_matrix(n, k, 0);
+    // Parallel calculation with n*k threads
     parallel_multiply(matrix_A, matrix_B, matrix_C);
     delete_matrix(matrix_C);
 
