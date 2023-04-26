@@ -67,12 +67,10 @@ matrix_t *serial_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B)
         {
             for (size_t k = 0; k < matrix_A->cols; k++)
             {
-                matrix_C->elements[i][j] += matrix_A->elements[i][k]*matrix_B->elements[k][j];
+                matrix_C->elements[i][j] += matrix_A->elements[i][k] * matrix_B->elements[k][j];
             }
-            
         }
     }
-    
 
     return matrix_C;
 }
