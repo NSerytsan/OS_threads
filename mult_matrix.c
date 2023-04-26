@@ -35,6 +35,9 @@ matrix_t *create_matrix(size_t rows, size_t cols, int autofill)
 
 void output_matrix(const matrix_t *matrix, char *title)
 {
+    if (matrix == NULL)
+        return;
+
     if (title != NULL)
     {
         printf("%s\n", title);
