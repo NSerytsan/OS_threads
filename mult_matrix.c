@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/time.h>
 
 typedef int element_t;
 typedef struct matrix_t
@@ -79,10 +80,15 @@ void output_matrix(const matrix_t *matrix, FILE *fp)
 
 void serial_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matrix_t *matrix_C)
 {
+    struct timeval start, end;
+    double exec_time = 0;
+
     if (matrix_A == NULL || matrix_B == NULL || matrix_C == NULL || matrix_A->cols != matrix_B->rows)
         return;
-    
+
     printf("\nSerial calculation:\n");
+
+    gettimeofday(&start, NULL);
     
     for (size_t i = 0; i < matrix_A->rows; i++)
     {
@@ -93,9 +99,14 @@ void serial_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matrix_
                 matrix_C->elements[i][j] +=
                     matrix_A->elements[i][k] * matrix_B->elements[k][j];
             }
-            printf("[%3ld,%3ld] = %d\n",i, j, matrix_C->elements[i][j]);
+            printf("[%3ld,%3ld] = %d\n", i, j, matrix_C->elements[i][j]);
         }
     }
+    
+    gettimeofday(&end, NULL);
+    exec_time = ((end.tv_sec - start.tv_sec) * 1000.) + (end.tv_usec - start.tv_usec) / 1000.0;
+    
+    printf("Serial calculation time: %.3lf ms\n", exec_time);
 }
 
 void *multiply_routine(void *args)
@@ -108,26 +119,30 @@ void *multiply_routine(void *args)
             thread_args->matrix_A->elements[thread_args->i][k] * thread_args->matrix_B->elements[k][thread_args->j];
     }
 
-    printf("[%3ld,%3ld] = %d\n",thread_args->i, thread_args->j, thread_args->matrix_C->elements[thread_args->i][thread_args->j]);
+    printf("[%3ld,%3ld] = %d\n", thread_args->i, thread_args->j, thread_args->matrix_C->elements[thread_args->i][thread_args->j]);
     pthread_exit(NULL);
 }
 
 void parallel_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matrix_t *matrix_C)
 {
-    if (matrix_A == NULL || matrix_B == NULL || matrix_C == NULL || matrix_A->cols != matrix_B->rows)
-        return;
-
+    struct timeval start, end;
+    double exec_time = 0;
     size_t num_threads = 0;
     pthread_t *threads = NULL;
     thread_args_t *args = NULL;
     size_t thread_count = 0;
+
+    if (matrix_A == NULL || matrix_B == NULL || matrix_C == NULL || matrix_A->cols != matrix_B->rows)
+        return;
 
     num_threads = matrix_A->rows * matrix_B->cols;
     threads = calloc(num_threads, sizeof(pthread_t));
     args = calloc(num_threads, sizeof(thread_args_t));
 
     printf("\nParallel calculation:\n");
-
+    
+    gettimeofday(&start, NULL);
+    
     for (size_t i = 0; i < matrix_A->rows; i++)
     {
         for (size_t j = 0; j < matrix_B->cols; j++)
@@ -148,6 +163,10 @@ void parallel_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matri
     {
         pthread_join(threads[i], NULL);
     }
+    
+    gettimeofday(&end, NULL);
+    exec_time = ((end.tv_sec - start.tv_sec) * 1000.0) + (end.tv_usec - start.tv_usec) / 1000.0;
+    printf("Parallel calculation time: %.3lf ms\n", exec_time);
 
     free(args);
     free(threads);
@@ -155,7 +174,7 @@ void parallel_multiply(const matrix_t *matrix_A, const matrix_t *matrix_B, matri
 
 int main(int argc, char const *argv[])
 {
-    size_t n = 10, m = 100000, k = 20;
+    size_t n = 20, m = 1000000, k = 10;
     matrix_t *matrix_A = NULL, *matrix_B = NULL, *matrix_C = NULL;
     size_t num_threads = 0;
 
