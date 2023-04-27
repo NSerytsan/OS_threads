@@ -4,7 +4,8 @@ project(OS_threads VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
-add_executable(matrix mult_matrix.c)
+add_executable(serial_mult_matrix serial_mult_matrix.c matrix.c)
+add_executable(parallel_mult_matrix parallel_mult_matrix.c matrix.c)
 add_executable(concurrency concurrency.c)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
